@@ -16,11 +16,10 @@ public class Registration {
     private static boolean permissionForFinalizationOfRegistration = false;
     private boolean loginCanProceed = false;
 
-    //CONSTANTS 
-    //[CONSTANT PATTERNS FOR THE DATA VALIDATION] 
+  
+    //CONSTANTS FOR PATTERNS
     private static final Pattern PASSWORD_PATTERN
             = Pattern.compile("^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$");
-
     /*
       IEEE Attribution for cellphone number regex (+27 followed by 9 digits):
       [1] Independent Communications Authority of South Africa (ICASA), “Electronic Communications Act: Regulations: Numbering plan,”
@@ -32,9 +31,9 @@ public class Registration {
      */
     private static final Pattern CELLPHONENUMBER_PATTERN
             = Pattern.compile("^\\+27\\d{9}$");
-    //END OF CONSTANTS [CONSTANT PATTERNS FOR THE DATA VALIDATION] 
+    //END OF CONSTANTS FOR PATTERNS
 
-    //[CONSTANT PATTERNS FOR THE FAILURE MESSAGES]
+    //CONSTANTS FOR FAILURE MESSAGES
     private static final String USERNAME_WRONG_SUGGESTION
             = "Username is not correctly formatted; please ensure that your username contains an underscore and is no more than five characters in length.";
 
@@ -43,15 +42,13 @@ public class Registration {
 
     private static final String CELLPHONE_WRONG_SUGGESTION
             = "Cell number is incorrectly formatted or does not contain an international code; please correct the number and try again.";
-//END OF [CONSTANT PATTERNS FOR THE FAILURE MESSAGES]
+    //END OF CONSTANTS FOR FAILURE MESSAGES
 
-    //CONSTRUCTOR
+    //Constructor 
     public Registration(String username, String password, String cellPhoneNumber, String name, String surname) {
         this.username = username;
         this.password = password;
         this.cellPhoneNumber = cellPhoneNumber;
-
-        // FIX: store name and surname
         this.name = name;
         this.surname = surname;
 
@@ -62,8 +59,9 @@ public class Registration {
             loginCanProceed = false;
         }
     }
-    //END OF CONSTRUCTOR 
+    //End Of constructor 
 
+    //Getters
     public String getUsername() {
         return username;
     }
@@ -83,6 +81,7 @@ public class Registration {
     public String getCellPhoneNumber() {
         return cellPhoneNumber;
     }
+    //End of Getters
 
     //Start of Error messages
     private String msgUserNameWrong() {
