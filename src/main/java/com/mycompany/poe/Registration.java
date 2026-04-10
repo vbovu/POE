@@ -13,10 +13,8 @@ public class Registration {
     private String cellPhoneNumber;
     private String name;
     private String surname;
-    private static boolean permissionForFinalizationOfRegistration = false;
     private boolean loginCanProceed = false;
 
-  
     //CONSTANTS FOR PATTERNS
     private static final Pattern PASSWORD_PATTERN
             = Pattern.compile("^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$");
@@ -32,18 +30,7 @@ public class Registration {
     private static final Pattern CELLPHONENUMBER_PATTERN
             = Pattern.compile("^\\+27\\d{9}$");
     //END OF CONSTANTS FOR PATTERNS
-
-    //CONSTANTS FOR FAILURE MESSAGES
-    private static final String USERNAME_WRONG_SUGGESTION
-            = "Username is not correctly formatted; please ensure that your username contains an underscore and is no more than five characters in length.";
-
-    private static final String USERPASSWORD_WRONG_SUGGESTION
-            = "Password is not correctly formatted; please ensure that the password contains at least eight characters, a capital letter, a number, and a special character.";
-
-    private static final String CELLPHONE_WRONG_SUGGESTION
-            = "Cell number is incorrectly formatted or does not contain an international code; please correct the number and try again.";
-    //END OF CONSTANTS FOR FAILURE MESSAGES
-
+    
     //Constructor 
     public Registration(String username, String password, String cellPhoneNumber, String name, String surname) {
         this.username = username;
@@ -52,12 +39,7 @@ public class Registration {
         this.name = name;
         this.surname = surname;
 
-        if (all_validations_passed()) {
-            permissionForFinalizationOfRegistration = true;
-            loginCanProceed = true;
-        } else {
-            loginCanProceed = false;
-        }
+        loginCanProceed = all_validations_passed();
     }
     //End Of constructor 
 
@@ -83,25 +65,25 @@ public class Registration {
     }
     //End of Getters
 
-    //Start of Error messages
+    //Start of Error messages methods
     private String msgUserNameWrong() {
-        return USERNAME_WRONG_SUGGESTION;
+        return Messages.USERNAME_WRONG_SUGGESTION;
     }
 
     private String msgPasswordWrong() {
-        return USERPASSWORD_WRONG_SUGGESTION;
+        return Messages.USERPASSWORD_WRONG_SUGGESTION;
     }
 
     private String msgCellPhoneWrong() {
-        return CELLPHONE_WRONG_SUGGESTION;
+        return Messages.CELLPHONE_WRONG_SUGGESTION;
     }
-    //End of Error messages 
+    //End of Error messages methods
 
-    //Success message
+    //Success messages method
     private String msgWelcome() {
-        return "Username successfully captured.\nPassword successfully captured.\nCell number successfully captured.";
+        return Messages.REGISTRATION_SUCCESS_BLOCK;
     }
-    //End of success message
+    //End of success message method
 
     //Data validation section [String manipulation where needed; Regex where needed] 
     public boolean checkUserName() {
@@ -137,21 +119,21 @@ public class Registration {
     //Feedback of validation to user
     public String getUsernameValidationMessage() {
         if (checkUserName()) {
-            return "Username successfully captured.";
+            return Messages.USERNAME_SUCCESS_MESSAGE;
         }
         return msgUserNameWrong();
     }
 
     public String getPasswordValidationMessage() {
         if (checkPasswordComplexity()) {
-            return "Password successfully captured.";
+            return Messages.PASSWORD_SUCCESS_MESSAGE;
         }
         return msgPasswordWrong();
     }
 
     public String getCellPhoneValidationMessage() {
         if (checkCellPhoneNumber()) {
-            return "Cell number successfully captured.";
+            return Messages.CELLPHONE_SUCCESS_MESSAGE;
         }
         return msgCellPhoneWrong();
     }

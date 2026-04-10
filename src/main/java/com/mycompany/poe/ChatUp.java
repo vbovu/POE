@@ -10,7 +10,7 @@ public class ChatUp {
 
     // Registration method
     private static Registration doRegistration(Scanner scanner) {
-        System.out.println("Welcome to ChatUp!");
+        System.out.println(Messages.APP_WELCOME);
 
         System.out.print("Please enter your name: ");
         String name = scanner.nextLine();
@@ -27,7 +27,7 @@ public class ChatUp {
         System.out.print("Please enter your cell phone number: ");
         String cellPhoneNumber = scanner.nextLine();
 
-        // POE compliance: registration checks done via Login class methods
+        //Registration checks done via Login class methods [like POE asked]
         Login registrationLogin = new Login(username, password, cellPhoneNumber, name, surname);
 
         System.out.println(registrationLogin.registerUser());
@@ -41,7 +41,7 @@ public class ChatUp {
 
     // Login method 
     private static boolean doLoginAttempt(Scanner scanner, Registration register) {
-        System.out.println("Time to Login back to a chattered world of ups!");
+        System.out.println(Messages.LOGIN_PROMPT);
 
         System.out.print("Please enter your username: ");
         String username = scanner.nextLine();
@@ -68,7 +68,7 @@ public class ChatUp {
         Registration register = doRegistration(scanner);
 
         if (register == null) {
-            System.out.println("Registration unsuccessful. Please restart the app and try again.");
+            System.out.println(Messages.REGISTRATION_UNSUCCESSFUL);
             return;
         }
         //End of Registration process
@@ -78,13 +78,13 @@ public class ChatUp {
 
         // Retry once (as hinted by rubric when they stated 'try again') 
         if (!success) {
-            System.out.println("First login attempt failed. This is your last try");
+            System.out.println(Messages.FIRST_LOGIN_FAILED_LAST_TRY);
             success = doLoginAttempt(scanner, register);
         }
 
         //if the 'retry' STILL fails 
         if (!success) {
-            System.out.println("Apologies. All attempts failed. Goodbye.");
+            System.out.println(Messages.ALL_ATTEMPTS_FAILED);
         }
 
         //End of Login process

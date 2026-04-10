@@ -1,5 +1,4 @@
 package com.mycompany.poe;
-
 /**
  *
  * @author lab_services_student: Vuyolwethu Bovu
@@ -35,7 +34,7 @@ public final class Login {
         this.registration = null;
     }
 
-    //Methods
+    //Start of Methods
     public boolean checkUserName() {
         return registration != null && registration.checkUserName();
     }
@@ -50,7 +49,7 @@ public final class Login {
 
     public String registerUser() {
         if (registration == null) {
-            return "Registration details not provided.";
+            return Messages.REG_DETAILS_NOT_PROVIDED;
         }
         return registration.registerUser();
     }
@@ -59,17 +58,17 @@ public final class Login {
         return registration != null && registration.getLoginCanProceedStatus();
     }
 
-    // Wrappers so Login has the required methods without rewriting the logic thats already in Registration
+    // Wrappers so Login has the needed methods without rewriting the logic thats already in Registration
     public String getUsernameValidationMessage() {
-        return registration != null ? registration.getUsernameValidationMessage() : "Registration details not provided.";
+        return registration != null ? registration.getUsernameValidationMessage() : Messages.REG_DETAILS_NOT_PROVIDED;
     }
 
     public String getPasswordValidationMessage() {
-        return registration != null ? registration.getPasswordValidationMessage() : "Registration details not provided.";
+        return registration != null ? registration.getPasswordValidationMessage() : Messages.REG_DETAILS_NOT_PROVIDED;
     }
 
     public String getCellPhoneValidationMessage() {
-        return registration != null ? registration.getCellPhoneValidationMessage() : "Registration details not provided.";
+        return registration != null ? registration.getCellPhoneValidationMessage() : Messages.REG_DETAILS_NOT_PROVIDED;
     }
 
     public Registration getRegisteredUser() {
@@ -77,19 +76,27 @@ public final class Login {
     }
     //End of Wrappers so Login has the required methods without rewriting the logic thats already in Registration
 
+    
     // Login user
     public boolean loginUser(Registration register) {
         successLogin = register.getUsername().equals(username)
                 && register.getPassword().equals(password);
         return successLogin;
     }
-
+    //End of Login user
+    
+    
+    
+    //Login Status 
     public String returnLoginStatus() {
         if (successLogin) {
-            return "Welcome " + name + ", " + surname + " it is great to see you again.";
+            return Messages.loginSuccessMessage(name, surname);
         }
-        return "Username or password incorrect, please try again.";
+        return Messages.LOGIN_FAIL_MESSAGE;
     }
-
+    //End of Login status
+    
+    
+    
     //End of Methods
 }
