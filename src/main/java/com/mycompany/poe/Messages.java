@@ -1,5 +1,10 @@
 package com.mycompany.poe;
 
+/**
+ *
+ * Part 1 done
+ * @author lab_services_student: Vuyolwethu Bovu
+ */
 public final class Messages {
 
     private Messages() {
