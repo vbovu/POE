@@ -14,48 +14,69 @@ public class RegistrationTest {
 
     @Test
     public void testGetUsername() {
-        Registration valid = new Registration("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
-        assertEquals("kyl_1", valid.getUsername());
+        Login valid = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
         assertTrue(valid.checkUserName());
+        assertEquals("Username successfully captured.", valid.getUsernameValidationMessage());
 
-        Registration invalid = new Registration("kyle!!!!!!!", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        Login invalid = new Login("kyle!!!!!!!", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
         assertFalse(invalid.checkUserName());
+        assertEquals(
+                "Username is not correctly formatted; please ensure that your username contains an underscore and is no more than five characters in length.",
+                invalid.getUsernameValidationMessage()
+        );
     }
 
     @Test
     public void testGetPassword() {
-        Registration valid = new Registration("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
-        assertEquals("Ch&&sec@ke99!", valid.getPassword());
+        Login valid = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
         assertTrue(valid.checkPasswordComplexity());
+        assertEquals("Password successfully captured.", valid.getPasswordValidationMessage());
 
-        Registration invalid = new Registration("kyl_1", "password", "+27838968976", "Kyle", "Smith");
+        Login invalid = new Login("kyl_1", "password", "+27838968976", "Kyle", "Smith");
         assertFalse(invalid.checkPasswordComplexity());
-    }
-
-    @Test
-    public void testGetName() {
-        Registration reg = new Registration("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
-        assertEquals("Kyle", reg.getName());
-    }
-
-    @Test
-    public void testGetSurname() {
-        Registration reg = new Registration("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
-        assertEquals("Smith", reg.getSurname());
+        assertEquals(
+                "Password is not correctly formatted; please ensure that the password contains at least eight characters, a capital letter, a number, and a special character.",
+                invalid.getPasswordValidationMessage()
+        );
     }
 
     @Test
     public void testGetCellPhone() {
-        Registration valid = new Registration("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        Login valid = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
         assertTrue(valid.checkCellPhoneNumber());
+        assertEquals("Cell number successfully captured.", valid.getCellPhoneValidationMessage());
 
-        Registration invalid = new Registration("kyl_1", "Ch&&sec@ke99!", "08966553", "Kyle", "Smith");
+        Login invalid = new Login("kyl_1", "Ch&&sec@ke99!", "08966553", "Kyle", "Smith");
         assertFalse(invalid.checkCellPhoneNumber());
+        assertEquals(
+                "Cell number is incorrectly formatted or does not contain an international code; please correct the number and try again.",
+                invalid.getCellPhoneValidationMessage()
+        );
+    }
+
+    @Test
+    public void testRegisterUserOverallMessage() {
+        Login valid = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        assertEquals(
+                "Username successfully captured.\nPassword successfully captured.\nCell number successfully captured.",
+                valid.registerUser()
+        );
+        assertTrue(valid.getLoginCanProceedStatus());
+
+        Login invalidUsername = new Login("kyle!!!!!!!", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        assertEquals(
+                "Username is not correctly formatted; please ensure that your username contains an underscore and is no more than five characters in length.",
+                invalidUsername.registerUser()
+        );
+        assertFalse(invalidUsername.getLoginCanProceedStatus());
     }
 
     @Test
     public void testLoginUser() {
-        Registration registered = new Registration("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        // register first (store details)
+        Login reg = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        assertTrue(reg.getLoginCanProceedStatus());
+        Registration registered = reg.getRegisteredUser();
 
         Login successLogin = new Login("kyl_1", "Ch&&sec@ke99!", "Kyle", "Smith");
         assertTrue(successLogin.loginUser(registered));

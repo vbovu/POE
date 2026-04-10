@@ -4,36 +4,57 @@ package com.mycompany.poe;
  *
  * @author lab_services_student: Vuyolwethu Bovu
  */
-import javax.swing.JOptionPane;
+import java.util.Scanner;
 
 public class ChatUp {
 
     // Registration method
-    private static Registration doRegistration() {
-        JOptionPane.showMessageDialog(null, "Welcome to ChatUp!");
+    private static Registration doRegistration(Scanner scanner) {
+        System.out.println("Welcome to ChatUp!");
 
-        String name = JOptionPane.showInputDialog("Please enter your name: ");
-        String surname = JOptionPane.showInputDialog("Please enter your surname: ");
-        String username = JOptionPane.showInputDialog("Please enter your username: ");
-        String password = JOptionPane.showInputDialog("Please enter your password: ");
-        String cellPhoneNumber = JOptionPane.showInputDialog("Please enter your cell phone number: ");
+        System.out.print("Please enter your name: ");
+        String name = scanner.nextLine();
 
-        return new Registration(username, password, cellPhoneNumber, name, surname);
+        System.out.print("Please enter your surname: ");
+        String surname = scanner.nextLine();
+
+        System.out.print("Please enter your username: ");
+        String username = scanner.nextLine();
+
+        System.out.print("Please enter your password: ");
+        String password = scanner.nextLine();
+
+        System.out.print("Please enter your cell phone number: ");
+        String cellPhoneNumber = scanner.nextLine();
+
+        // POE compliance: registration checks done via Login class methods
+        Login registrationLogin = new Login(username, password, cellPhoneNumber, name, surname);
+
+        System.out.println(registrationLogin.registerUser());
+
+        if (!registrationLogin.getLoginCanProceedStatus()) {
+            return null;
+        }
+
+        return registrationLogin.getRegisteredUser();
     }
 
     // Login method 
-    private static boolean doLoginAttempt(Registration register) {
-        JOptionPane.showMessageDialog(null, "Time to Login back to a chattered world of ups!");
+    private static boolean doLoginAttempt(Scanner scanner, Registration register) {
+        System.out.println("Time to Login back to a chattered world of ups!");
 
-        String username = JOptionPane.showInputDialog("Please enter your username: ");
-        String password = JOptionPane.showInputDialog("Please enter your password: ");
+        System.out.print("Please enter your username: ");
+        String username = scanner.nextLine();
+
+        System.out.print("Please enter your password: ");
+        String password = scanner.nextLine();
 
         Login login = new Login(username, password, register.getName(), register.getSurname());
 
         boolean success = login.loginUser(register);
 
         // show the rubric message after the attempt
-        JOptionPane.showMessageDialog(null, login.returnLoginStatus());
+        System.out.println(login.returnLoginStatus());
 
         return success;
     }
@@ -41,27 +62,29 @@ public class ChatUp {
     // Main method
     public static void main(String[] args) {
 
-        // Registration process 
-        Registration register = doRegistration();
+        Scanner scanner = new Scanner(System.in);
 
-        if (!register.getLoginCanProceedStatus()) {
-            JOptionPane.showMessageDialog(null, "Registration unsuccessful. Please restart the app and try again.");
+        // Registration process 
+        Registration register = doRegistration(scanner);
+
+        if (register == null) {
+            System.out.println("Registration unsuccessful. Please restart the app and try again.");
             return;
         }
         //End of Registration process
 
         //Login process
-        boolean success = doLoginAttempt(register);
+        boolean success = doLoginAttempt(scanner, register);
 
         // Retry once (as hinted by rubric when they stated 'try again') 
         if (!success) {
-            JOptionPane.showMessageDialog(null, "First login attempt failed. This is your last try");
-            success = doLoginAttempt(register);
+            System.out.println("First login attempt failed. This is your last try");
+            success = doLoginAttempt(scanner, register);
         }
 
-        //if the 'retry' STILL fails
+        //if the 'retry' STILL fails 
         if (!success) {
-            JOptionPane.showMessageDialog(null, "Apologies. All attempts failed. Goodbye.");
+            System.out.println("Apologies. All attempts failed. Goodbye.");
         }
 
         //End of Login process
