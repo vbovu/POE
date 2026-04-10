@@ -1,6 +1,6 @@
 package com.mycompany.poe;
 /**
- *
+ * Part 1: Done
  * @author lab_services_student: Vuyolwethu Bovu
  */
 public final class Login {
