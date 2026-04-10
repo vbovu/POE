@@ -51,9 +51,9 @@ public final class Messages {
     
     // Console UI messages (not part of rubric marking, but used for the user experience)
     public static final String APP_WELCOME = "Welcome to ChatUp!";
-    public static final String LOGIN_PROMPT = "Time to Login back to a chattered world of ups!";
+    public static final String LOGIN_PROMPT = "Time to log in back to a chattered world of ups!";
     public static final String REGISTRATION_UNSUCCESSFUL = "Registration unsuccessful. Please restart the app and try again.";
     public static final String FIRST_LOGIN_FAILED_LAST_TRY = "First login attempt failed. This is your last try";
     public static final String ALL_ATTEMPTS_FAILED = "Apologies. All attempts failed. Goodbye.";
-    // Console UI messages (not part of rubric marking, but used for the user experience)
+    // End of Console UI messages (not part of rubric marking, but used for the user experience)
 }
