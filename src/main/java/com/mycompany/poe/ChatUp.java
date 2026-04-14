@@ -70,6 +70,7 @@ public class ChatUp {
 
         if (register == null) {
             System.out.println(Messages.REGISTRATION_UNSUCCESSFUL);
+            scanner.close();
             return;
         }
         //End of Registration process
@@ -89,5 +90,6 @@ public class ChatUp {
         }
 
         //End of Login process
+        scanner.close();
     }
 }

@@ -7,6 +7,7 @@ public final class Login {
 
     private String username;
     private String password;
+    private String cellPhoneNumber;
 
     private boolean successLogin = false;
 
@@ -21,6 +22,7 @@ public final class Login {
         this.registration = new Registration(username, password, cellPhoneNumber, name, surname);
         this.username = username;
         this.password = password;
+        this.cellPhoneNumber = cellPhoneNumber;
         this.name = name;
         this.surname = surname;
     }
@@ -31,20 +33,24 @@ public final class Login {
         this.password = password;
         this.name = name;
         this.surname = surname;
+        this.cellPhoneNumber = null;
         this.registration = null;
     }
 
     //Start of Methods
     public boolean checkUserName() {
-        return registration != null && registration.checkUserName();
+        // validate even if this Login object was created for login-only (registration == null)
+        return Registration.isValidUsername(username);
     }
 
     public boolean checkPasswordComplexity() {
-        return registration != null && registration.checkPasswordComplexity();
+        // validate even if this Login object was created for login-only (registration == null)
+        return Registration.isValidPassword(password);
     }
 
     public boolean checkCellPhoneNumber() {
-        return registration != null && registration.checkCellPhoneNumber();
+        // validate even if this Login object was created for login-only (registration == null)
+        return Registration.isValidCellPhoneNumber(cellPhoneNumber);
     }
 
     public String registerUser() {
@@ -60,15 +66,24 @@ public final class Login {
 
     // Wrappers so Login has the needed methods without rewriting the logic thats already in Registration
     public String getUsernameValidationMessage() {
-        return registration != null ? registration.getUsernameValidationMessage() : Messages.REG_DETAILS_NOT_PROVIDED;
+        if (checkUserName()) {
+            return Messages.USERNAME_SUCCESS_MESSAGE;
+        }
+        return Messages.USERNAME_WRONG_SUGGESTION;
     }
 
     public String getPasswordValidationMessage() {
-        return registration != null ? registration.getPasswordValidationMessage() : Messages.REG_DETAILS_NOT_PROVIDED;
+        if (checkPasswordComplexity()) {
+            return Messages.PASSWORD_SUCCESS_MESSAGE;
+        }
+        return Messages.USERPASSWORD_WRONG_SUGGESTION;
     }
 
     public String getCellPhoneValidationMessage() {
-        return registration != null ? registration.getCellPhoneValidationMessage() : Messages.REG_DETAILS_NOT_PROVIDED;
+        if (checkCellPhoneNumber()) {
+            return Messages.CELLPHONE_SUCCESS_MESSAGE;
+        }
+        return Messages.CELLPHONE_WRONG_SUGGESTION;
     }
 
     public Registration getRegisteredUser() {
@@ -76,18 +91,44 @@ public final class Login {
     }
     //End of Wrappers so Login has the required methods without rewriting the logic thats already in Registration
 
-    
+
     // Login user
     public boolean loginUser(Registration register) {
+        if (register == null || username == null || password == null) {
+            successLogin = false;
+            return false;
+        }
+
         successLogin = register.getUsername().equals(username)
                 && register.getPassword().equals(password);
         return successLogin;
     }
     //End of Login user
-    
-    
-    
-    //Login Status 
+
+
+    //Added for strict rubric signature compatibility (Boolean loginUser())
+    public boolean loginUser() {
+        if (registration == null || username == null || password == null) {
+            successLogin = false;
+            return false;
+        }
+
+        successLogin = registration.getUsername().equals(username)
+                && registration.getPassword().equals(password);
+        return successLogin;
+    }
+    //End of added rubric signature compatibility
+
+
+    //Helper setter so you can reuse the same Login object in tests if needed
+    public void setLoginCredentials(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+    //End of helper setter
+
+
+    //Login Status
     public String returnLoginStatus() {
         if (successLogin) {
             return Messages.loginSuccessMessage(name, surname);
@@ -95,8 +136,6 @@ public final class Login {
         return Messages.LOGIN_FAIL_MESSAGE;
     }
     //End of Login status
-    
-    
-    
+
     //End of Methods
 }

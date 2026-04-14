@@ -9,65 +9,108 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class RegistrationTest {
 
-    public RegistrationTest() {
+    // -----------------------------
+    // 6 x assertEquals tests (messages)
+    // -----------------------------
+
+    @Test
+    public void testUsernameCorrectlyFormatted_AssertEquals_WelcomeMessage() {
+        // register user (store details)
+        Login regLogin = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        Registration registered = regLogin.getRegisteredUser();
+
+        // login attempt
+        Login loginAttempt = new Login("kyl_1", "Ch&&sec@ke99!", "Kyle", "Smith");
+        loginAttempt.loginUser(registered);
+
+        assertEquals(Messages.loginSuccessMessage("Kyle", "Smith"), loginAttempt.returnLoginStatus());
     }
 
     @Test
-    public void testGetUsername() {
-        Login valid = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
-        assertTrue(valid.checkUserName());
-        assertEquals(Messages.USERNAME_SUCCESS_MESSAGE, valid.getUsernameValidationMessage());
-
+    public void testUsernameIncorrectlyFormatted_AssertEquals() {
         Login invalid = new Login("kyle!!!!!!!", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
-        assertFalse(invalid.checkUserName());
         assertEquals(Messages.USERNAME_WRONG_SUGGESTION, invalid.getUsernameValidationMessage());
     }
 
     @Test
-    public void testGetPassword() {
+    public void testPasswordMeetsComplexity_AssertEquals() {
         Login valid = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
-        assertTrue(valid.checkPasswordComplexity());
         assertEquals(Messages.PASSWORD_SUCCESS_MESSAGE, valid.getPasswordValidationMessage());
+    }
 
+    @Test
+    public void testPasswordDoesNotMeetComplexity_AssertEquals() {
         Login invalid = new Login("kyl_1", "password", "+27838968976", "Kyle", "Smith");
-        assertFalse(invalid.checkPasswordComplexity());
         assertEquals(Messages.USERPASSWORD_WRONG_SUGGESTION, invalid.getPasswordValidationMessage());
     }
 
     @Test
-    public void testGetCellPhone() {
+    public void testCellPhoneCorrectlyFormatted_AssertEquals() {
         Login valid = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
-        assertTrue(valid.checkCellPhoneNumber());
         assertEquals(Messages.CELLPHONE_SUCCESS_MESSAGE, valid.getCellPhoneValidationMessage());
+    }
 
+    @Test
+    public void testCellPhoneIncorrectlyFormatted_AssertEquals() {
         Login invalid = new Login("kyl_1", "Ch&&sec@ke99!", "08966553", "Kyle", "Smith");
-        assertFalse(invalid.checkCellPhoneNumber());
         assertEquals(Messages.CELLPHONE_WRONG_SUGGESTION, invalid.getCellPhoneValidationMessage());
     }
 
-    @Test
-    public void testRegisterUserOverallMessage() {
-        Login valid = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
-        assertEquals(Messages.REGISTRATION_SUCCESS_BLOCK, valid.registerUser());
-        assertTrue(valid.getLoginCanProceedStatus());
+    // -----------------------------
+    // 8 x assertTrue / assertFalse tests (booleans)
+    // -----------------------------
 
-        Login invalidUsername = new Login("kyle!!!!!!!", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
-        assertEquals(Messages.USERNAME_WRONG_SUGGESTION, invalidUsername.registerUser());
-        assertFalse(invalidUsername.getLoginCanProceedStatus());
+    @Test
+    public void testLoginSuccessful_AssertTrue() {
+        Login regLogin = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        Registration registered = regLogin.getRegisteredUser();
+
+        Login attempt = new Login("kyl_1", "Ch&&sec@ke99!", "Kyle", "Smith");
+        assertTrue(attempt.loginUser(registered));
     }
 
     @Test
-    public void testLoginUser() {
-        // register first (store details)
-        Login reg = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
-        Registration registered = reg.getRegisteredUser();
+    public void testLoginFailed_AssertFalse() {
+        Login regLogin = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        Registration registered = regLogin.getRegisteredUser();
 
-        Login successLogin = new Login("kyl_1", "Ch&&sec@ke99!", "Kyle", "Smith");
-        assertTrue(successLogin.loginUser(registered));
-        assertEquals(Messages.loginSuccessMessage("Kyle", "Smith"), successLogin.returnLoginStatus());
+        Login attempt = new Login("kyl_1", "wrongpassword", "Kyle", "Smith");
+        assertFalse(attempt.loginUser(registered));
+    }
 
-        Login failedLogin = new Login("kyl_1", "wrongpassword", "Kyle", "Smith");
-        assertFalse(failedLogin.loginUser(registered));
-        assertEquals(Messages.LOGIN_FAIL_MESSAGE, failedLogin.returnLoginStatus());
+    @Test
+    public void testUsernameCorrectlyFormatted_AssertTrue() {
+        Login valid = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        assertTrue(valid.checkUserName());
+    }
+
+    @Test
+    public void testUsernameIncorrectlyFormatted_AssertFalse() {
+        Login invalid = new Login("kyle!!!!!!!", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        assertFalse(invalid.checkUserName());
+    }
+
+    @Test
+    public void testPasswordMeetsComplexity_AssertTrue() {
+        Login valid = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        assertTrue(valid.checkPasswordComplexity());
+    }
+
+    @Test
+    public void testPasswordDoesNotMeetComplexity_AssertFalse() {
+        Login invalid = new Login("kyl_1", "password", "+27838968976", "Kyle", "Smith");
+        assertFalse(invalid.checkPasswordComplexity());
+    }
+
+    @Test
+    public void testCellPhoneCorrectlyFormatted_AssertTrue() {
+        Login valid = new Login("kyl_1", "Ch&&sec@ke99!", "+27838968976", "Kyle", "Smith");
+        assertTrue(valid.checkCellPhoneNumber());
+    }
+
+    @Test
+    public void testCellPhoneIncorrectlyFormatted_AssertFalse() {
+        Login invalid = new Login("kyl_1", "Ch&&sec@ke99!", "08966553", "Kyle", "Smith");
+        assertFalse(invalid.checkCellPhoneNumber());
     }
 }
