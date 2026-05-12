@@ -1,0 +1,8 @@
+name: Hello World Action
+on: [push] # Triggered every time you push code
+jobs:
+  say-hello:
+    runs-on: windows-latest # The type of machine to use
+    steps:
+      - name: Run a greeting
+        run: echo "Hello, GitHub Actions!"
