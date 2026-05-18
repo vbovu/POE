@@ -20,5 +20,5 @@ jobs:
           cache: maven
 
       - name: Run Maven tests
-        run: mvn clean install -X
+        run: mvn -e -X -B test
 
