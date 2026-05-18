@@ -57,13 +57,13 @@ public class Message {
     //Start of Message ID section
     private static String generateMessageID() {
         Random random = new Random();
-        StringBuilder generatedID = new StringBuilder();
+        String generatedID = "";
 
         for (int digitCounter = 0; digitCounter < 10; digitCounter++) {
-            generatedID.append(random.nextInt(10));
+            generatedID += random.nextInt(10);
         }
 
-        return generatedID.toString();
+        return generatedID;
     }
 
     public boolean checkMessageID() {
@@ -235,12 +235,12 @@ public class Message {
             createMessageHash();
         }
 
-        StringBuilder messageDetails = new StringBuilder();
-        messageDetails.append("Message ID: ").append(messageID).append("\n");
-        messageDetails.append("Message Hash: ").append(messageHash).append("\n");
-        messageDetails.append("Recipient: ").append(recipientCell).append("\n");
-        messageDetails.append("Message: ").append(messageContent);
-        return messageDetails.toString();
+        String messageDetails = "";
+        messageDetails += "Message ID: " + messageID + "\n";
+        messageDetails += "Message Hash: " + messageHash + "\n";
+        messageDetails += "Recipient: " + recipientCell + "\n";
+        messageDetails += "Message: " + messageContent;
+        return messageDetails;
     }
 
     public static String printMessages() {
@@ -248,14 +248,14 @@ public class Message {
             return "No messages sent yet.";
         }
 
-        StringBuilder sentMessages = new StringBuilder();
+        String sentMessages = "";
 
         for (Message message : sentSessionMessages) {
-            sentMessages.append(message.printCurrentMessageDetails()).append("\n");
-            sentMessages.append("----------------------------").append("\n");
+            sentMessages += message.printCurrentMessageDetails() + "\n";
+            sentMessages += "----------------------------" + "\n";
         }
 
-        return sentMessages.toString();
+        return sentMessages;
     }
     //End of Print messages section
 
