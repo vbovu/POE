@@ -23,18 +23,18 @@ public class Registration {
   IEEE Attribution (phone format requirement + Java regex implementation)
   Purpose of this regex:
   1) I used this regex to validate the POE test format for a South African number with the +27 followed by 9 digits.
-  2) Then I created the regex using the numbering/country code information in [1] and [2], and implemented it using Java’s regex engine
+  2) Then I created the regex using the numbering/country code information in [1] and [2], and implemented it using Java's regex engine
     (Pattern/Matcher) as explained in [3].
-    
-  [1] Independent Communications Authority of South Africa (ICASA), “Electronic Communications Act: Regulations: Numbering plan,”
+
+  [1] Independent Communications Authority of South Africa (ICASA), "Electronic Communications Act: Regulations: Numbering plan,"
       Government Gazette No. 39861, Notice 370, Mar. 24, 2016. [Online]. Available:
       <https://www.gov.za/sites/default/files/gcis_document/201603/39861gon370.pdf>. [Accessed: Apr. 10, 2026].
 
-  [2] International Telecommunication Union (ITU), “List of Recommendation ITU-T E.164 assigned country codes (Position on 15 December 2016),”
+  [2] International Telecommunication Union (ITU), "List of Recommendation ITU-T E.164 assigned country codes (Position on 15 December 2016),"
       Annex to ITU Operational Bulletin No. 1114, Geneva, 2016. [Online]. Available:
       <https://www.itu.int/dms_pub/itu-t/opb/sp/T-SP-E.164D-2016-PDF-E.pdf>. [Accessed: Apr. 10, 2026].
 
-  [3] Oracle, “Pattern (Java Platform, Standard Edition 8 API Specification),” [Online]. Available:
+  [3] Oracle, "Pattern (Java Platform, Standard Edition 8 API Specification)," [Online]. Available:
       <https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html>. [Accessed: Apr. 10, 2026].
      */
 
