@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -20,5 +20,4 @@ jobs:
           cache: maven
 
       - name: Run Maven tests
-        run: mvn -e -X -B test
-
+        run: mvn -B test
