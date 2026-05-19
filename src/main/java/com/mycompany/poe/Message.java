@@ -1,12 +1,13 @@
 package com.mycompany.poe;
 
 /**
- * Part 2 done
  *
+ * Part 2: Message feature
  * @author lab_services_student: Vuyolwethu Bovu
  */
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
@@ -18,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -34,6 +34,8 @@ public class Message {
     private static int totalMessagesSent = 0;
 
     private static final ArrayList<Message> sentSessionMessages = new ArrayList<>();
+    private static final ArrayList<String> generatedMessageIDs = new ArrayList<>();
+
     private static final String JSON_FILE = "messages.json";
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
@@ -42,7 +44,7 @@ public class Message {
 
     //Start of Constructors
     public Message(String recipientCell, String messageContent, int messageNumber) {
-        this(generateMessageID(), recipientCell, messageContent, messageNumber);
+        this(generateUniqueMessageID(), recipientCell, messageContent, messageNumber);
     }
 
     public Message(String messageID, String recipientCell, String messageContent, int messageNumber) {
@@ -50,24 +52,43 @@ public class Message {
         this.recipientCell = recipientCell;
         this.messageContent = messageContent;
         this.messageNumber = messageNumber;
+        this.messageHash = "";
         this.messageStatus = "Pending";
+
+        if (messageID != null && !generatedMessageIDs.contains(messageID)) {
+            generatedMessageIDs.add(messageID);
+        }
     }
     //End of Constructors
 
     //Start of Message ID section
-    private static String generateMessageID() {
+    private static String generateUniqueMessageID() {
         Random random = new Random();
         String generatedID = "";
+        boolean uniqueIDFound = false;
 
-        for (int digitCounter = 0; digitCounter < 10; digitCounter++) {
-            generatedID += random.nextInt(10);
+        while (!uniqueIDFound) {
+            generatedID = "";
+
+            for (int digitCounter = 0; digitCounter < 10; digitCounter++) {
+                int generatedDigit = random.nextInt(10);
+                generatedID = generatedID + generatedDigit;
+            }
+
+            if (!generatedMessageIDs.contains(generatedID)) {
+                uniqueIDFound = true;
+            }
         }
 
         return generatedID;
     }
 
     public boolean checkMessageID() {
-        return messageID != null && messageID.length() <= 10;
+        if (messageID == null) {
+            return false;
+        }
+
+        return messageID.length() <= 10;
     }
 
     public String getMessageIDGeneratedMessage() {
@@ -75,98 +96,150 @@ public class Message {
     }
     //End of Message ID section
 
-    //Start of Recipient cell number section
+    //Start of Recipient cell section
+    public boolean isRecipientCellValid() {
+        return Registration.isValidCellPhoneNumber(recipientCell);
+    }
+
     public String checkRecipientCell() {
-        if (Registration.isValidCellPhoneNumber(recipientCell)) {
+        if (isRecipientCellValid()) {
             return "Cell phone number successfully captured.";
         }
 
         return "Cell phone number is incorrectly formatted or does not contain an international code. Please correct the number and try again.";
     }
-    //End of Recipient cell number section
+    //End of Recipient cell section
 
     //Start of Message length section
-    public String checkMessageLength() {
-        int currentLength = (messageContent == null) ? 0 : messageContent.length();
+    public boolean isMessageLengthValid() {
+        int messageLength = 0;
 
-        if (currentLength <= 250) {
+        if (messageContent != null) {
+            messageLength = messageContent.length();
+        }
+
+        return messageLength <= 250;
+    }
+
+    public String checkMessageLength() {
+        int messageLength = 0;
+
+        if (messageContent != null) {
+            messageLength = messageContent.length();
+        }
+
+        if (messageLength <= 250) {
             return "Message ready to send.";
         }
 
-        int charactersOverLimit = currentLength - 250;
-        return "Message exceeds 250 characters by " + charactersOverLimit + "; please reduce the size.";
+        int numberOfCharactersOverLimit = messageLength - 250;
+        return "Message exceeds 250 characters by " + numberOfCharactersOverLimit + "; please reduce the size.";
     }
     //End of Message length section
 
-    //Start of Message Hash section
+    //Start of Message hash section
     public String createMessageHash() {
-        String safeMessage = (messageContent == null) ? "" : messageContent.trim();
-        String[] messageWords = safeMessage.isEmpty() ? new String[0] : safeMessage.split("\\s+");
+        String preparedMessage = "";
 
-        String firstWord = (messageWords.length == 0) ? "" : removePunctuation(messageWords[0]);
-        String lastWord = (messageWords.length == 0) ? "" : removePunctuation(messageWords[messageWords.length - 1]);
+        if (messageContent != null) {
+            preparedMessage = messageContent.trim();
+        }
 
-        String safeMessageID = (messageID == null) ? "" : messageID;
-        String firstTwoDigits = safeMessageID.length() >= 2 ? safeMessageID.substring(0, 2) : safeMessageID;
-        this.messageHash = firstTwoDigits + ":" + messageNumber + ":" + (firstWord + lastWord).toUpperCase(Locale.ROOT);
+        String firstWord = "";
+        String lastWord = "";
 
-        return this.messageHash;
+        if (!preparedMessage.isEmpty()) {
+            String[] messageWords = preparedMessage.split("\\s+");
+
+            firstWord = removePunctuation(messageWords[0]);
+            lastWord = removePunctuation(messageWords[messageWords.length - 1]);
+        }
+
+        String firstTwoDigitsOfMessageID = "";
+
+        if (messageID != null) {
+            if (messageID.length() >= 2) {
+                firstTwoDigitsOfMessageID = messageID.substring(0, 2);
+            } else {
+                firstTwoDigitsOfMessageID = messageID;
+            }
+        }
+
+        messageHash = firstTwoDigitsOfMessageID
+                + ":"
+                + messageNumber
+                + ":"
+                + (firstWord + lastWord).toUpperCase();
+
+        return messageHash;
     }
 
     private String removePunctuation(String word) {
         return word.replaceAll("[^A-Za-z0-9]", "");
     }
-    //End of Message Hash section
+    //End of Message hash section
 
-    //Start of Message decision section
-    public String sentMessage() {
+    //Start of Sending choice section
+    public String SentMessage() {
         Scanner scanner = new Scanner(System.in);
-        return sentMessage(scanner);
+        return SentMessage(scanner);
     }
 
-    public String sentMessage(Scanner scanner) {
-        System.out.println("Key of choices:");
-        System.out.println("1 - Send Message");
-        System.out.println("2 - Disregard Message");
-        System.out.println("3 - Store Message to send later");
+    public String SentMessage(Scanner scanner) {
+        System.out.println("Please select what should happen to this message:");
+        System.out.println("1) Send Message");
+        System.out.println("2) Disregard Message");
+        System.out.println("3) Store Message to send later");
         System.out.print("Enter your choice: ");
 
-        String choice = scanner.nextLine();
-        return sentMessage(choice);
+        String messageChoice = scanner.nextLine();
+        return SentMessage(messageChoice);
     }
 
-    public String sentMessage(String choice) {
-        if (choice == null) {
+    public String SentMessage(String messageChoice) {
+        if (messageChoice == null) {
             return "Invalid choice. Please try again.";
         }
 
-        String preparedChoice = choice.trim().toUpperCase(Locale.ROOT);
+        String preparedChoice = messageChoice.trim().toUpperCase();
 
-        return switch (preparedChoice) {
-            //Send Message
-            case "1", "SEND", "SEND MESSAGE" -> sendMessage();
-            //End of Send Message
+        switch (preparedChoice) {
+            //Start of Send Message choice
+            case "1", "SEND", "SEND MESSAGE" -> {
+                return sendMessage();
+            }
+            //End of Send Message choice
 
-            //Disregard Message
-            case "2", "DISREGARD", "DISREGARD MESSAGE", "DISCARD", "DISCARD MESSAGE" -> disregardMessage();
-            //End of Disregard Message
+            //Start of Disregard Message choice
+            case "2", "DISREGARD", "DISREGARD MESSAGE", "DISCARD", "DISCARD MESSAGE" -> {
+                return disregardMessage();
+            }
+            //End of Disregard Message choice
 
-            //Store Message to send later
-            case "3", "STORE", "STORE MESSAGE", "STORE MESSAGE TO SEND LATER" -> storeMessage();
-            //End of Store Message to send later
+            //Start of Store Message choice
+            case "3", "STORE", "STORE MESSAGE", "STORE MESSAGE TO SEND LATER" -> {
+                return storeMessage();
+            }
+            //End of Store Message choice
 
-            default -> "Invalid choice. Please try again.";
-        };
+            default -> {
+                return "Invalid choice. Please try again.";
+            }
+        }
     }
 
-    //Added for strict rubric wording compatibility (String: SentMessage())
-    public String SentMessage() {
-        return sentMessage();
+    //Rubric-friendly lower-case wrapper for calls that use standard Java method naming
+    public String sentMessage(Scanner scanner) {
+        return SentMessage(scanner);
     }
-    //End of added rubric wording compatibility
-    //End of Message decision section
 
-    //Start of Send, disregard and store section
+    //Rubric-friendly lower-case wrapper for direct unit tests
+    public String sentMessage(String messageChoice) {
+        return SentMessage(messageChoice);
+    }
+    //End of Sending choice section
+
+    //Start of Send, disregard and store messages section
     public String sendMessage() {
         if (messageHash == null || messageHash.isEmpty()) {
             createMessageHash();
@@ -175,6 +248,7 @@ public class Message {
         messageStatus = "Sent";
         totalMessagesSent++;
         sentSessionMessages.add(this);
+
         return "Message successfully sent.";
     }
 
@@ -188,16 +262,23 @@ public class Message {
     }
 
     /*
-      IEEE Attribution (JSON storage research)
-      Purpose of this method:
-      1) Gson is used to convert Message objects into JSON and back into Java objects [1].
-      2) Java NIO file helpers are used to read and write the JSON file safely [2].
+      IEEE Attribution for the researched JSON storage feature:
+      This feature uses Gson to convert Message objects into JSON text and to read stored JSON text back into Java Message objects [1].
+      This feature also uses Java file utilities to read and write the JSON text file [2].
+      The file-open options used when writing the JSON file are described by Oracle's StandardOpenOption documentation [3].
 
+      References
       [1] Google, "Gson User Guide," [Online]. Available:
-          <https://google.github.io/gson/UserGuide.html>. [Accessed: May 18, 2026].
+          <https://google.github.io/gson/UserGuide.html>
+          [Accessed: May 19, 2026].
 
-      [2] Oracle, "Files (Java Platform, Standard Edition 8 API Specification)," [Online]. Available:
-          <https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html>. [Accessed: May 18, 2026].
+      [2] Oracle, "Files (Java Platform, Standard Edition 17 & JDK 17)," [Online]. Available:
+          <https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Files.html>
+          [Accessed: May 19, 2026].
+
+      [3] Oracle, "StandardOpenOption (Java Platform, Standard Edition 17 & JDK 17)," [Online]. Available:
+          <https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/StandardOpenOption.html>
+          [Accessed: May 19, 2026].
     */
     public String storeMessage() {
         if (messageHash == null || messageHash.isEmpty()) {
@@ -206,15 +287,16 @@ public class Message {
 
         messageStatus = "Stored";
 
-        // Load whatever is already saved first so that earlier stored messages are not overwritten
-        ArrayList<Message> existingStoredMessages = loadMessagesFromFile();
+        //This is to load whatever is already saved first so that earlier stored messages are not overwritten
+        ArrayList<Message> storedMessages = loadMessagesFromJsonFile();
 
-        // Add this message instance to the list
-        existingStoredMessages.add(this);
+        //This is to add this exact message instance to the stored message list because the user chose to store it
+        storedMessages.add(this);
 
-        // Write the updated list back to the JSON file
-        String json = GSON.toJson(existingStoredMessages);
+        //This part is where Gson converts the updated Java list of stored Message objects into JSON text [1].
+        String json = GSON.toJson(storedMessages);
 
+        //This part is where Java Files opens the JSON file for writing [2]. CREATE creates it if needed, while TRUNCATE_EXISTING clears old file text before the updated JSON is written [3].
         try (BufferedWriter writer = Files.newBufferedWriter(
                 Paths.get(JSON_FILE),
                 StandardOpenOption.CREATE,
@@ -227,7 +309,7 @@ public class Message {
             return "Error storing message: " + e.getMessage();
         }
     }
-    //End of Send, disregard and store section
+    //End of Send, disregard and store messages section
 
     //Start of Print messages section
     public String printCurrentMessageDetails() {
@@ -236,10 +318,11 @@ public class Message {
         }
 
         String messageDetails = "";
-        messageDetails += "Message ID: " + messageID + "\n";
-        messageDetails += "Message Hash: " + messageHash + "\n";
-        messageDetails += "Recipient: " + recipientCell + "\n";
-        messageDetails += "Message: " + messageContent;
+        messageDetails = messageDetails + "Message ID: " + messageID + "\n";
+        messageDetails = messageDetails + "Message Hash: " + messageHash + "\n";
+        messageDetails = messageDetails + "Recipient: " + recipientCell + "\n";
+        messageDetails = messageDetails + "Message: " + messageContent;
+
         return messageDetails;
     }
 
@@ -250,9 +333,9 @@ public class Message {
 
         String sentMessages = "";
 
-        for (Message message : sentSessionMessages) {
-            sentMessages += message.printCurrentMessageDetails() + "\n";
-            sentMessages += "----------------------------" + "\n";
+        for (Message sentMessage : sentSessionMessages) {
+            sentMessages = sentMessages + sentMessage.printCurrentMessageDetails() + "\n";
+            sentMessages = sentMessages + "----------------------------" + "\n";
         }
 
         return sentMessages;
@@ -264,37 +347,44 @@ public class Message {
         return totalMessagesSent;
     }
 
-    public static int getTotalMessagesSent() {
-        return totalMessagesSent;
-    }
-
-    //Added for strict rubric typo compatibility (returnTotalMessagess)
+    //Rubric typo compatibility [the PoE table uses returnTotalMessagess() so I decided to copy it exactly for the POE stated]
     public int returnTotalMessagess() {
         return returnTotalMessages();
     }
-    //End of added rubric typo compatibility
+
+    public static int getTotalMessagesSent() {
+        return totalMessagesSent;
+    }
     //End of Total messages section
 
-    //Start of JSON file loading section
-    private ArrayList<Message> loadMessagesFromFile() {
-        File file = new File(JSON_FILE);
+    //Start of JSON loading section
+    private ArrayList<Message> loadMessagesFromJsonFile() {
+        File jsonFile = new File(JSON_FILE);
 
-        if (!file.exists()) {
+        if (!jsonFile.exists()) {
             return new ArrayList<>();
         }
 
-        Type listType = new TypeToken<ArrayList<Message>>() {
+        //This part is where TypeToken keeps the ArrayList<Message> type available while Gson reads the stored JSON data [1].
+        Type storedMessageListType = new TypeToken<ArrayList<Message>>() {
         }.getType();
 
+        //This part is where Java Files opens the JSON file for reading [2].
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(JSON_FILE))) {
-            ArrayList<Message> loadedMessages = GSON.fromJson(reader, listType);
-            return (loadedMessages != null) ? loadedMessages : new ArrayList<>();
+            //This part is where Gson converts the stored JSON text back into a Java list of Message objects [1].
+            ArrayList<Message> storedMessages = GSON.fromJson(reader, storedMessageListType);
 
-        } catch (IOException e) {
+            if(storedMessages == null) {
+                return new ArrayList<>();
+            }
+
+            return storedMessages;
+
+        } catch (IOException | JsonSyntaxException e) {
             return new ArrayList<>();
         }
     }
-    //End of JSON file loading section
+    //End of JSON loading section
 
     //Start of Getters
     public String getMessageID() {
@@ -322,16 +412,17 @@ public class Message {
     }
     //End of Getters
 
-    //Start of Unit test helper
-    static void resetMessageStateForTesting() {
+    //Start of Unit test support
+    static void resetMessageDataForTests() {
         totalMessagesSent = 0;
         sentSessionMessages.clear();
+        generatedMessageIDs.clear();
 
         try {
             Files.deleteIfExists(Paths.get(JSON_FILE));
-        } catch (IOException ignored) {
-            //No action is required during test cleanup
+        } catch (IOException e) {
+            //This catch can remain empty because there is no further action required during test cleanup
         }
     }
-    //End of Unit test helper
+    //End of Unit test support
 }
