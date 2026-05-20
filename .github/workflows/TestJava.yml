@@ -3,7 +3,7 @@ name: Test Java
 on:
   push:
   pull_request:
-
+  workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -21,3 +21,4 @@ jobs:
 
       - name: Run Maven tests
         run: mvn -B test
+      
