@@ -180,6 +180,8 @@ public class Message {
     //End of Message hash section
 
     //Start of Sending choice section
+    //Rubric-compatible no-argument method. The running console app uses SentMessage(scanner)
+    //so that one shared Scanner is passed from ChatUp through QuickChat.
     public String SentMessage() {
         Scanner scanner = new Scanner(System.in);
         return SentMessage(scanner);
@@ -287,16 +289,16 @@ public class Message {
 
         messageStatus = "Stored";
 
-        //This is to load whatever is already saved first so that earlier stored messages are not overwritten
+        //Load whatever is already saved first so that earlier stored messages are not overwritten
         ArrayList<Message> storedMessages = loadMessagesFromJsonFile();
 
-        //This is to add this exact message instance to the stored message list because the user chose to store it
+        //Add this exact message instance to the stored message list because the user chose to store it
         storedMessages.add(this);
 
-        //This part is where Gson converts the updated Java list of stored Message objects into JSON text [1].
+        //Gson converts the updated Java list of stored Message objects into JSON text [1].
         String json = GSON.toJson(storedMessages);
 
-        //This part is where Java Files opens the JSON file for writing [2]. CREATE creates it if needed, while TRUNCATE_EXISTING clears old file text before the updated JSON is written [3].
+        //Java Files opens the JSON file for writing [2]. CREATE creates it if needed, while TRUNCATE_EXISTING clears old file text before the updated JSON is written [3].
         try (BufferedWriter writer = Files.newBufferedWriter(
                 Paths.get(JSON_FILE),
                 StandardOpenOption.CREATE,
@@ -347,7 +349,7 @@ public class Message {
         return totalMessagesSent;
     }
 
-    //Rubric typo compatibility [the PoE table uses returnTotalMessagess() so I decided to copy it exactly for the POE stated]
+    //Rubric typo compatibility [the PoE table uses returnTotalMessagess()]
     public int returnTotalMessagess() {
         return returnTotalMessages();
     }
@@ -365,16 +367,16 @@ public class Message {
             return new ArrayList<>();
         }
 
-        //This part is where TypeToken keeps the ArrayList<Message> type available while Gson reads the stored JSON data [1].
+        //TypeToken keeps the ArrayList<Message> type available while Gson reads the stored JSON data [1].
         Type storedMessageListType = new TypeToken<ArrayList<Message>>() {
         }.getType();
 
-        //This part is where Java Files opens the JSON file for reading [2].
+        //Java Files opens the JSON file for reading [2].
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(JSON_FILE))) {
-            //This part is where Gson converts the stored JSON text back into a Java list of Message objects [1].
+            //Gson converts the stored JSON text back into a Java list of Message objects [1].
             ArrayList<Message> storedMessages = GSON.fromJson(reader, storedMessageListType);
 
-            if(storedMessages == null) {
+            if (storedMessages == null) {
                 return new ArrayList<>();
             }
 
@@ -421,7 +423,7 @@ public class Message {
         try {
             Files.deleteIfExists(Paths.get(JSON_FILE));
         } catch (IOException e) {
-            //This catch can remain empty because there is no further action required during test cleanup
+            //No further action is required during test cleanup
         }
     }
     //End of Unit test support

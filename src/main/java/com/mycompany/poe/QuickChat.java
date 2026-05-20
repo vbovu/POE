@@ -88,7 +88,7 @@ public class QuickChat {
             return;
         }
 
-        for (int messageCounter = numberOfMessagesEntered; messageCounter < maximumMessagesToEnter; messageCounter++) {
+        for (int messageCounter = numberOfMessagesEntered; messageCounter < maximumMessagesToEnter;) {
             System.out.println();
             System.out.println("Message " + (messageCounter + 1) + " of " + maximumMessagesToEnter);
 
@@ -99,7 +99,6 @@ public class QuickChat {
             String messageContent = scanner.nextLine();
 
             Message message = new Message(recipientCell, messageContent, messageCounter);
-            numberOfMessagesEntered++;
 
             System.out.println(message.getMessageIDGeneratedMessage());
             System.out.println(message.checkRecipientCell());
@@ -111,6 +110,10 @@ public class QuickChat {
             if (!recipientIsValid || !messageLengthIsValid) {
                 continue;
             }
+
+            //Only a valid message entry uses one of the user-defined message slots.
+            numberOfMessagesEntered++;
+            messageCounter++;
 
             System.out.println("Message Hash: " + message.createMessageHash());
 
