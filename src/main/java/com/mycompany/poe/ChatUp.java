@@ -2,7 +2,7 @@ package com.mycompany.poe;
 
 /**
  *
- * Part 1 done + Part 2 QuickChat handover added
+ * Part 1 done + Part 2 QuickChat handover added + Part 3 sender handover added
  * @author lab_services_student: Vuyolwethu Bovu
  */
 import java.util.Scanner;
@@ -96,10 +96,13 @@ public class ChatUp {
         }
         //End of Login process
 
-        //Start of QuickChat handover [reached only after successful authentication]
-        QuickChat quickChat = new QuickChat(scanner);
+        //Part 2 and Part 3 [Start of Handover logic to QuickChat]
+        //Start of QuickChat handover [This part is only reached after successful authentication]
+        //Part 3 also passes the registered user so the message system can display the sender in reports
+        QuickChat quickChat = new QuickChat(scanner, register);
         quickChat.startQuickChat();
-        //End of QuickChat handover [reached only after successful authentication]
+        //End of QuickChat handover
+        //End of Part 2 and Part 3
 
         scanner.close();
     }
