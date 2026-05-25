@@ -259,11 +259,14 @@ public class MessageReportManager {
     public String searchMessagesByRecipient(String recipientCell) {
         String preparedRecipientCell = safeString(recipientCell).trim();
         String output = "";
-        String[] includedMessageIDs = new String[allSessionMessageCount + storedMessages.length + 5];
+
+        refreshStoredMessagesArrayFromJson();
+
+        String[] includedMessageIDs = new String[sentMessageCount + storedMessages.length + 5];
         int includedMessageIDCount = 0;
 
-        for (int index = 0; index < allSessionMessageCount; index++) {
-            Message message = allSessionMessages[index];
+        for (int index = 0; index < sentMessageCount; index++) {
+            Message message = sentMessages[index];
 
             if (messageMatchesRecipientForSentOrStoredSearch(message, preparedRecipientCell)) {
                 output = addMessageContentToOutput(output, message.getMessageContent());
@@ -271,8 +274,6 @@ public class MessageReportManager {
                 includedMessageIDCount++;
             }
         }
-
-        refreshStoredMessagesArrayFromJson();
 
         for (int index = 0; index < storedMessages.length; index++) {
             Message message = storedMessages[index];
@@ -353,11 +354,79 @@ public class MessageReportManager {
         try {
             Message.writeStoredMessagesToJsonFile(updatedMessagesList);
             refreshStoredMessagesArrayFromJson();
+            removeDeletedMessageFromCurrentSessionArrays(deletedMessage);
         } catch (IOException e) {
             return "Error deleting message: " + e.getMessage();
         }
 
         return "Message: \"" + prepareMessageForDeleteResponse(deletedMessage.getMessageContent()) + "\" successfully deleted.";
+    }
+
+    private void removeDeletedMessageFromCurrentSessionArrays(Message deletedMessage) {
+        if (deletedMessage == null) {
+            return;
+        }
+
+        String deletedHash = safeString(deletedMessage.getMessageHash());
+        String deletedID = safeString(deletedMessage.getMessageID());
+
+        allSessionMessageCount = removeMessageFromArray(allSessionMessages, allSessionMessageCount, deletedHash, deletedID);
+        sentMessageCount = removeMessageFromArray(sentMessages, sentMessageCount, deletedHash, deletedID);
+        disregardedMessageCount = removeMessageFromArray(disregardedMessages, disregardedMessageCount, deletedHash, deletedID);
+        messageHashCount = removeStringFromArray(messageHashes, messageHashCount, deletedHash);
+        messageIDCount = removeStringFromArray(messageIDs, messageIDCount, deletedID);
+    }
+
+    private int removeMessageFromArray(Message[] messages, int messageCount, String deletedHash, String deletedID) {
+        int writeIndex = 0;
+
+        for (int readIndex = 0; readIndex < messageCount; readIndex++) {
+            Message currentMessage = messages[readIndex];
+
+            if (!messageMatchesDeletedMessage(currentMessage, deletedHash, deletedID)) {
+                messages[writeIndex] = currentMessage;
+                writeIndex++;
+            }
+        }
+
+        for (int clearIndex = writeIndex; clearIndex < messageCount; clearIndex++) {
+            messages[clearIndex] = null;
+        }
+
+        return writeIndex;
+    }
+
+    private boolean messageMatchesDeletedMessage(Message message, String deletedHash, String deletedID) {
+        if (message == null) {
+            return false;
+        }
+
+        if (!deletedHash.isEmpty() && safeString(message.getMessageHash()).equals(deletedHash)) {
+            return true;
+        }
+
+        return !deletedID.isEmpty() && safeString(message.getMessageID()).equals(deletedID);
+    }
+
+    private int removeStringFromArray(String[] values, int valueCount, String valueToDelete) {
+        if (valueToDelete == null || valueToDelete.isEmpty()) {
+            return valueCount;
+        }
+
+        int writeIndex = 0;
+
+        for (int readIndex = 0; readIndex < valueCount; readIndex++) {
+            if (!safeString(values[readIndex]).equals(valueToDelete)) {
+                values[writeIndex] = values[readIndex];
+                writeIndex++;
+            }
+        }
+
+        for (int clearIndex = writeIndex; clearIndex < valueCount; clearIndex++) {
+            values[clearIndex] = null;
+        }
+
+        return writeIndex;
     }
 
     private String prepareMessageForDeleteResponse(String messageContent) {
